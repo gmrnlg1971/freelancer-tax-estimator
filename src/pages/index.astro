@@ -24,7 +24,7 @@ import Layout from '../layouts/Layout.astro';
 								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<span class="text-slate-400 font-medium">$</span>
 								</div>
-								<input type="number" id="gross-income" class="input-field pl-8 font-medium" placeholder="75000" min="0" value="75000" />
+								<input type="number" id="gross-income" class="input-field !pl-8 font-medium" placeholder="75000" min="0" value="75000" />
 							</div>
 							<p class="text-xs text-slate-500 mt-1">Total 1099-NEC earnings before expenses.</p>
 						</div>
@@ -35,7 +35,7 @@ import Layout from '../layouts/Layout.astro';
 								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<span class="text-slate-400 font-medium">$</span>
 								</div>
-								<input type="number" id="expenses" class="input-field pl-8 font-medium" placeholder="5000" min="0" value="5000" />
+								<input type="number" id="expenses" class="input-field !pl-8 font-medium" placeholder="5000" min="0" value="5000" />
 							</div>
 							<p class="text-xs text-slate-500 mt-1">Deductible business write-offs.</p>
 						</div>
@@ -52,33 +52,56 @@ import Layout from '../layouts/Layout.astro';
 						<div>
 							<label for="state" class="block text-sm font-semibold text-slate-700 mb-1">State (For State Tax)</label>
 							<select id="state" class="input-field font-medium bg-white">
-								<optgroup label="Popular States">
-									<option value="CA">California</option>
-									<option value="TX">Texas (No Tax)</option>
-									<option value="FL">Florida (No Tax)</option>
-									<option value="NY">New York</option>
-									<option value="PA">Pennsylvania</option>
-									<option value="IL">Illinois</option>
-									<option value="OH">Ohio</option>
-									<option value="GA">Georgia</option>
-									<option value="NC">North Carolina</option>
-									<option value="MI">Michigan</option>
-								</optgroup>
-								<optgroup label="Other Zero-Tax States">
-									<option value="NV">Nevada</option>
-									<option value="WA">Washington</option>
-									<option value="WY">Wyoming</option>
-									<option value="SD">South Dakota</option>
-									<option value="TN">Tennessee</option>
-									<option value="AK">Alaska</option>
-									<option value="NH">New Hampshire</option>
-								</optgroup>
-								<optgroup label="Flat Tax States">
-									<option value="CO">Colorado</option>
-									<option value="UT">Utah</option>
-									<option value="MA">Massachusetts</option>
-								</optgroup>
-								<option value="OTHER" selected>Other State (Average 5%)</option>
+<option value="AL">Alabama</option>
+<option value="AK">Alaska</option>
+<option value="AZ">Arizona</option>
+<option value="AR">Arkansas</option>
+<option value="CA">California</option>
+<option value="CO">Colorado</option>
+<option value="CT">Connecticut</option>
+<option value="DE">Delaware</option>
+<option value="FL">Florida</option>
+<option value="GA">Georgia</option>
+<option value="HI">Hawaii</option>
+<option value="ID">Idaho</option>
+<option value="IL">Illinois</option>
+<option value="IN">Indiana</option>
+<option value="IA">Iowa</option>
+<option value="KS">Kansas</option>
+<option value="KY">Kentucky</option>
+<option value="LA">Louisiana</option>
+<option value="ME">Maine</option>
+<option value="MD">Maryland</option>
+<option value="MA">Massachusetts</option>
+<option value="MI">Michigan</option>
+<option value="MN">Minnesota</option>
+<option value="MS">Mississippi</option>
+<option value="MO">Missouri</option>
+<option value="MT">Montana</option>
+<option value="NE">Nebraska</option>
+<option value="NV">Nevada</option>
+<option value="NH">New Hampshire</option>
+<option value="NJ">New Jersey</option>
+<option value="NM">New Mexico</option>
+<option value="NY">New York</option>
+<option value="NC">North Carolina</option>
+<option value="ND">North Dakota</option>
+<option value="OH">Ohio</option>
+<option value="OK">Oklahoma</option>
+<option value="OR">Oregon</option>
+<option value="PA">Pennsylvania</option>
+<option value="RI">Rhode Island</option>
+<option value="SC">South Carolina</option>
+<option value="SD">South Dakota</option>
+<option value="TN">Tennessee</option>
+<option value="TX">Texas</option>
+<option value="UT">Utah</option>
+<option value="VT">Vermont</option>
+<option value="VA">Virginia</option>
+<option value="WA">Washington</option>
+<option value="WV">West Virginia</option>
+<option value="WI">Wisconsin</option>
+<option value="WY">Wyoming</option>
 							</select>
 						</div>
 					</div>
@@ -194,69 +217,220 @@ import Layout from '../layouts/Layout.astro';
 
 	// State Tax Definitions
 	const stateTaxData: Record<string, any> = {
-		// 0% States
-		"TX": { type: "flat", rate: 0 },
-		"FL": { type: "flat", rate: 0 },
-		"NV": { type: "flat", rate: 0 },
-		"WA": { type: "flat", rate: 0 },
-		"WY": { type: "flat", rate: 0 },
-		"SD": { type: "flat", rate: 0 },
-		"TN": { type: "flat", rate: 0 },
-		"AK": { type: "flat", rate: 0 },
-		"NH": { type: "flat", rate: 0 },
-		
-		// Flat Tax States
-		"PA": { type: "flat", rate: 0.0307 },
-		"IL": { type: "flat", rate: 0.0495 },
-		"MI": { type: "flat", rate: 0.0425 },
-		"NC": { type: "flat", rate: 0.045 },
-		"GA": { type: "flat", rate: 0.0549 },
-		"CO": { type: "flat", rate: 0.044 },
-		"UT": { type: "flat", rate: 0.0465 },
-		"MA": { type: "flat", rate: 0.05 },
-		
-		// Progressive States (Simplified single filer brackets for estimation)
-		"CA": { 
-			type: "progressive", 
-			brackets: [
-				{ limit: 10412, rate: 0.01 },
-				{ limit: 24684, rate: 0.02 },
-				{ limit: 38959, rate: 0.04 },
-				{ limit: 54081, rate: 0.06 },
-				{ limit: 68350, rate: 0.08 },
-				{ limit: 349137, rate: 0.093 },
-				{ limit: 418961, rate: 0.103 },
-				{ limit: 698271, rate: 0.113 },
-				{ limit: Infinity, rate: 0.123 }
-			],
-			std: 5363
-		},
-		"NY": {
-			type: "progressive",
-			brackets: [
-				{ limit: 8500, rate: 0.04 },
-				{ limit: 11700, rate: 0.045 },
-				{ limit: 13900, rate: 0.0525 },
-				{ limit: 80650, rate: 0.055 },
-				{ limit: 215400, rate: 0.06 },
-				{ limit: 1077550, rate: 0.0685 },
-				{ limit: 5000000, rate: 0.0965 },
-				{ limit: 25000000, rate: 0.103 },
-				{ limit: Infinity, rate: 0.109 }
-			],
-			std: 8000
-		},
-		"OH": {
-			type: "progressive",
-			brackets: [
-				{ limit: 26050, rate: 0 },
-				{ limit: 100000, rate: 0.0275 },
-				{ limit: Infinity, rate: 0.035 }
-			],
-			std: 0
-		},
-		"OTHER": { type: "flat", rate: 0.05 } // 5% flat generic average
-	};
+  "AL": { type: "progressive", std: 3000, brackets: [
+      { limit: 500, rate: 0.02 },
+      { limit: 3000, rate: 0.04 },
+      { limit: Infinity, rate: 0.05 },
+    ] },
+  "AK": { type: "flat", rate: 0 },
+  "AZ": { type: "flat", rate: 0.025 },
+  "AR": { type: "progressive", std: 2340, brackets: [
+      { limit: 4400, rate: 0.02 },
+      { limit: 8800, rate: 0.04 },
+      { limit: Infinity, rate: 0.044 },
+    ] },
+  "CA": { type: "progressive", std: 5363, brackets: [
+      { limit: 10412, rate: 0.01 },
+      { limit: 24684, rate: 0.02 },
+      { limit: 38959, rate: 0.04 },
+      { limit: 54081, rate: 0.06 },
+      { limit: 68350, rate: 0.08 },
+      { limit: 349137, rate: 0.093 },
+      { limit: 418961, rate: 0.103 },
+      { limit: 698271, rate: 0.113 },
+      { limit: Infinity, rate: 0.123 },
+    ] },
+  "CO": { type: "flat", rate: 0.044 },
+  "CT": { type: "progressive", std: 0, brackets: [
+      { limit: 10000, rate: 0.03 },
+      { limit: 50000, rate: 0.05 },
+      { limit: 100000, rate: 0.055 },
+      { limit: 250000, rate: 0.06 },
+      { limit: 500000, rate: 0.065 },
+      { limit: Infinity, rate: 0.0699 },
+    ] },
+  "DE": { type: "progressive", std: 3250, brackets: [
+      { limit: 2000, rate: 0 },
+      { limit: 5000, rate: 0.022 },
+      { limit: 10000, rate: 0.039 },
+      { limit: 20000, rate: 0.048 },
+      { limit: 25000, rate: 0.052 },
+      { limit: 60000, rate: 0.0555 },
+      { limit: Infinity, rate: 0.066 },
+    ] },
+  "FL": { type: "flat", rate: 0 },
+  "GA": { type: "flat", rate: 0.0549 },
+  "HI": { type: "progressive", std: 2200, brackets: [
+      { limit: 2400, rate: 0.014 },
+      { limit: 4800, rate: 0.032 },
+      { limit: 9600, rate: 0.055 },
+      { limit: 14400, rate: 0.064 },
+      { limit: 19200, rate: 0.068 },
+      { limit: 24000, rate: 0.072 },
+      { limit: 36000, rate: 0.076 },
+      { limit: 48000, rate: 0.079 },
+      { limit: 150000, rate: 0.0825 },
+      { limit: 175000, rate: 0.09 },
+      { limit: 200000, rate: 0.1 },
+      { limit: Infinity, rate: 0.11 },
+    ] },
+  "ID": { type: "flat", rate: 0.058 },
+  "IL": { type: "flat", rate: 0.0495 },
+  "IN": { type: "flat", rate: 0.0305 },
+  "IA": { type: "flat", rate: 0.057 },
+  "KS": { type: "progressive", std: 3500, brackets: [
+      { limit: 15000, rate: 0.031 },
+      { limit: 30000, rate: 0.0525 },
+      { limit: Infinity, rate: 0.057 },
+    ] },
+  "KY": { type: "flat", rate: 0.04 },
+  "LA": { type: "progressive", std: 4500, brackets: [
+      { limit: 12500, rate: 0.0185 },
+      { limit: 50000, rate: 0.035 },
+      { limit: Infinity, rate: 0.0425 },
+    ] },
+  "ME": { type: "progressive", std: 14600, brackets: [
+      { limit: 24500, rate: 0.058 },
+      { limit: 58050, rate: 0.0715 },
+      { limit: Infinity, rate: 0.0715 },
+    ] },
+  "MD": { type: "progressive", std: 2550, brackets: [
+      { limit: 1000, rate: 0.02 },
+      { limit: 2000, rate: 0.03 },
+      { limit: 3000, rate: 0.04 },
+      { limit: 100000, rate: 0.0475 },
+      { limit: 125000, rate: 0.05 },
+      { limit: 150000, rate: 0.0525 },
+      { limit: 250000, rate: 0.055 },
+      { limit: Infinity, rate: 0.0575 },
+    ] },
+  "MA": { type: "flat", rate: 0.05 },
+  "MI": { type: "flat", rate: 0.0425 },
+  "MN": { type: "progressive", std: 13825, brackets: [
+      { limit: 30070, rate: 0.0535 },
+      { limit: 98760, rate: 0.068 },
+      { limit: 183340, rate: 0.0785 },
+      { limit: Infinity, rate: 0.0985 },
+    ] },
+  "MS": { type: "flat", rate: 0.047 },
+  "MO": { type: "progressive", std: 14600, brackets: [
+      { limit: 1208, rate: 0 },
+      { limit: 2416, rate: 0.02 },
+      { limit: 3624, rate: 0.025 },
+      { limit: 4832, rate: 0.03 },
+      { limit: 6040, rate: 0.035 },
+      { limit: 7248, rate: 0.04 },
+      { limit: 8456, rate: 0.045 },
+      { limit: Infinity, rate: 0.0495 },
+    ] },
+  "MT": { type: "progressive", std: 5540, brackets: [
+      { limit: 3600, rate: 0.047 },
+      { limit: Infinity, rate: 0.059 },
+    ] },
+  "NE": { type: "progressive", std: 7900, brackets: [
+      { limit: 3700, rate: 0.0246 },
+      { limit: 22170, rate: 0.0351 },
+      { limit: 35730, rate: 0.0501 },
+      { limit: Infinity, rate: 0.0584 },
+    ] },
+  "NV": { type: "flat", rate: 0 },
+  "NH": { type: "flat", rate: 0 },
+  "NJ": { type: "progressive", std: 1000, brackets: [
+      { limit: 20000, rate: 0.014 },
+      { limit: 35000, rate: 0.0175 },
+      { limit: 40000, rate: 0.035 },
+      { limit: 75000, rate: 0.0552 },
+      { limit: 500000, rate: 0.0637 },
+      { limit: 1000000, rate: 0.0897 },
+      { limit: Infinity, rate: 0.1075 },
+    ] },
+  "NM": { type: "progressive", std: 14600, brackets: [
+      { limit: 5500, rate: 0.017 },
+      { limit: 11000, rate: 0.032 },
+      { limit: 16000, rate: 0.047 },
+      { limit: 210000, rate: 0.049 },
+      { limit: Infinity, rate: 0.059 },
+    ] },
+  "NY": { type: "progressive", std: 8000, brackets: [
+      { limit: 8500, rate: 0.04 },
+      { limit: 11700, rate: 0.045 },
+      { limit: 13900, rate: 0.0525 },
+      { limit: 80650, rate: 0.055 },
+      { limit: 215400, rate: 0.06 },
+      { limit: 1077550, rate: 0.0685 },
+      { limit: 5000000, rate: 0.0965 },
+      { limit: 25000000, rate: 0.103 },
+      { limit: Infinity, rate: 0.109 },
+    ] },
+  "NC": { type: "flat", rate: 0.045 },
+  "ND": { type: "progressive", std: 14600, brackets: [
+      { limit: 44725, rate: 0.011 },
+      { limit: 108150, rate: 0.0204 },
+      { limit: 225975, rate: 0.0227 },
+      { limit: Infinity, rate: 0.025 },
+    ] },
+  "OH": { type: "progressive", std: 0, brackets: [
+      { limit: 26050, rate: 0 },
+      { limit: 100000, rate: 0.0275 },
+      { limit: Infinity, rate: 0.035 },
+    ] },
+  "OK": { type: "progressive", std: 6350, brackets: [
+      { limit: 1000, rate: 0.0025 },
+      { limit: 2500, rate: 0.0075 },
+      { limit: 3750, rate: 0.0175 },
+      { limit: 4900, rate: 0.0275 },
+      { limit: 7200, rate: 0.0375 },
+      { limit: Infinity, rate: 0.0475 },
+    ] },
+  "OR": { type: "progressive", std: 2605, brackets: [
+      { limit: 4050, rate: 0.0475 },
+      { limit: 10200, rate: 0.0675 },
+      { limit: 125000, rate: 0.0875 },
+      { limit: Infinity, rate: 0.099 },
+    ] },
+  "PA": { type: "flat", rate: 0.0307 },
+  "RI": { type: "progressive", std: 10000, brackets: [
+      { limit: 73450, rate: 0.0375 },
+      { limit: 166950, rate: 0.0475 },
+      { limit: Infinity, rate: 0.0599 },
+    ] },
+  "SC": { type: "progressive", std: 14600, brackets: [
+      { limit: 3460, rate: 0 },
+      { limit: 17330, rate: 0.03 },
+      { limit: Infinity, rate: 0.064 },
+    ] },
+  "SD": { type: "flat", rate: 0 },
+  "TN": { type: "flat", rate: 0 },
+  "TX": { type: "flat", rate: 0 },
+  "UT": { type: "flat", rate: 0.0465 },
+  "VT": { type: "progressive", std: 7450, brackets: [
+      { limit: 43950, rate: 0.0335 },
+      { limit: 106350, rate: 0.066 },
+      { limit: 218200, rate: 0.076 },
+      { limit: Infinity, rate: 0.0875 },
+    ] },
+  "VA": { type: "progressive", std: 8000, brackets: [
+      { limit: 3000, rate: 0.02 },
+      { limit: 5000, rate: 0.03 },
+      { limit: 17000, rate: 0.05 },
+      { limit: Infinity, rate: 0.0575 },
+    ] },
+  "WA": { type: "flat", rate: 0 },
+  "WV": { type: "progressive", std: 0, brackets: [
+      { limit: 10000, rate: 0.0236 },
+      { limit: 25000, rate: 0.0315 },
+      { limit: 40000, rate: 0.0354 },
+      { limit: 60000, rate: 0.0472 },
+      { limit: Infinity, rate: 0.0512 },
+    ] },
+  "WI": { type: "progressive", std: 12560, brackets: [
+      { limit: 13810, rate: 0.035 },
+      { limit: 27630, rate: 0.044 },
+      { limit: 304170, rate: 0.053 },
+      { limit: Infinity, rate: 0.0765 },
+    ] },
+  "WY": { type: "flat", rate: 0 },
+};
 
 	function calculateTaxes() {
 		const grossIncome = parseFloat((document.getElementById('gross-income') as HTMLInputElement).value) || 0;
