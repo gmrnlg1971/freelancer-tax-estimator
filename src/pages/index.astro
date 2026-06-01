@@ -46,7 +46,40 @@ import Layout from '../layouts/Layout.astro';
 								<option value="single">Single</option>
 								<option value="married">Married Filing Jointly</option>
 							</select>
-							<p class="text-xs text-slate-500 mt-1">Determines your standard deduction & brackets.</p>
+							<p class="text-xs text-slate-500 mt-1">Determines your federal standard deduction.</p>
+						</div>
+
+						<div>
+							<label for="state" class="block text-sm font-semibold text-slate-700 mb-1">State (For State Tax)</label>
+							<select id="state" class="input-field font-medium bg-white">
+								<optgroup label="Popular States">
+									<option value="CA">California</option>
+									<option value="TX">Texas (No Tax)</option>
+									<option value="FL">Florida (No Tax)</option>
+									<option value="NY">New York</option>
+									<option value="PA">Pennsylvania</option>
+									<option value="IL">Illinois</option>
+									<option value="OH">Ohio</option>
+									<option value="GA">Georgia</option>
+									<option value="NC">North Carolina</option>
+									<option value="MI">Michigan</option>
+								</optgroup>
+								<optgroup label="Other Zero-Tax States">
+									<option value="NV">Nevada</option>
+									<option value="WA">Washington</option>
+									<option value="WY">Wyoming</option>
+									<option value="SD">South Dakota</option>
+									<option value="TN">Tennessee</option>
+									<option value="AK">Alaska</option>
+									<option value="NH">New Hampshire</option>
+								</optgroup>
+								<optgroup label="Flat Tax States">
+									<option value="CO">Colorado</option>
+									<option value="UT">Utah</option>
+									<option value="MA">Massachusetts</option>
+								</optgroup>
+								<option value="OTHER" selected>Other State (Average 5%)</option>
+							</select>
 						</div>
 					</div>
 				</div>
@@ -82,6 +115,13 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 							<span class="font-bold text-slate-800" id="out-fed-tax">$0</span>
 						</div>
+						<div class="flex justify-between items-center pb-3 border-b border-slate-100">
+							<div class="flex items-center gap-2">
+								<div class="w-3 h-3 rounded-full bg-amber-500"></div>
+								<span class="text-slate-600 font-medium">State Income Tax</span>
+							</div>
+							<span class="font-bold text-slate-800" id="out-state-tax">$0</span>
+						</div>
 						<div class="flex justify-between items-center pt-2">
 							<span class="text-slate-800 font-bold">Total Estimated Tax</span>
 							<span class="font-extrabold text-red-500 text-lg" id="out-total-tax">$0</span>
@@ -91,16 +131,18 @@ import Layout from '../layouts/Layout.astro';
 					<!-- Visual Bar -->
 					<div class="mt-6 pt-6 border-t border-slate-100">
 						<div class="h-4 w-full bg-slate-100 rounded-full overflow-hidden flex" id="visual-bar">
-							<div class="bg-emerald-500 h-full" id="bar-take-home" style="width: 70%"></div>
+							<div class="bg-emerald-500 h-full" id="bar-take-home" style="width: 60%"></div>
 							<div class="bg-blue-500 h-full" id="bar-se-tax" style="width: 15%"></div>
 							<div class="bg-indigo-500 h-full" id="bar-fed-tax" style="width: 10%"></div>
+							<div class="bg-amber-500 h-full" id="bar-state-tax" style="width: 10%"></div>
 							<div class="bg-slate-300 h-full" id="bar-expenses" style="width: 5%"></div>
 						</div>
 						<div class="flex justify-between text-[10px] sm:text-xs text-slate-500 mt-2 font-medium">
 							<span>Take Home</span>
-							<span>SE Tax</span>
-							<span>Fed Tax</span>
-							<span>Expenses</span>
+							<span>SE</span>
+							<span>Fed</span>
+							<span>State</span>
+							<span>Exp</span>
 						</div>
 					</div>
 					
@@ -150,10 +192,77 @@ import Layout from '../layouts/Layout.astro';
 		married: 29200
 	};
 
+	// State Tax Definitions
+	const stateTaxData: Record<string, any> = {
+		// 0% States
+		"TX": { type: "flat", rate: 0 },
+		"FL": { type: "flat", rate: 0 },
+		"NV": { type: "flat", rate: 0 },
+		"WA": { type: "flat", rate: 0 },
+		"WY": { type: "flat", rate: 0 },
+		"SD": { type: "flat", rate: 0 },
+		"TN": { type: "flat", rate: 0 },
+		"AK": { type: "flat", rate: 0 },
+		"NH": { type: "flat", rate: 0 },
+		
+		// Flat Tax States
+		"PA": { type: "flat", rate: 0.0307 },
+		"IL": { type: "flat", rate: 0.0495 },
+		"MI": { type: "flat", rate: 0.0425 },
+		"NC": { type: "flat", rate: 0.045 },
+		"GA": { type: "flat", rate: 0.0549 },
+		"CO": { type: "flat", rate: 0.044 },
+		"UT": { type: "flat", rate: 0.0465 },
+		"MA": { type: "flat", rate: 0.05 },
+		
+		// Progressive States (Simplified single filer brackets for estimation)
+		"CA": { 
+			type: "progressive", 
+			brackets: [
+				{ limit: 10412, rate: 0.01 },
+				{ limit: 24684, rate: 0.02 },
+				{ limit: 38959, rate: 0.04 },
+				{ limit: 54081, rate: 0.06 },
+				{ limit: 68350, rate: 0.08 },
+				{ limit: 349137, rate: 0.093 },
+				{ limit: 418961, rate: 0.103 },
+				{ limit: 698271, rate: 0.113 },
+				{ limit: Infinity, rate: 0.123 }
+			],
+			std: 5363
+		},
+		"NY": {
+			type: "progressive",
+			brackets: [
+				{ limit: 8500, rate: 0.04 },
+				{ limit: 11700, rate: 0.045 },
+				{ limit: 13900, rate: 0.0525 },
+				{ limit: 80650, rate: 0.055 },
+				{ limit: 215400, rate: 0.06 },
+				{ limit: 1077550, rate: 0.0685 },
+				{ limit: 5000000, rate: 0.0965 },
+				{ limit: 25000000, rate: 0.103 },
+				{ limit: Infinity, rate: 0.109 }
+			],
+			std: 8000
+		},
+		"OH": {
+			type: "progressive",
+			brackets: [
+				{ limit: 26050, rate: 0 },
+				{ limit: 100000, rate: 0.0275 },
+				{ limit: Infinity, rate: 0.035 }
+			],
+			std: 0
+		},
+		"OTHER": { type: "flat", rate: 0.05 } // 5% flat generic average
+	};
+
 	function calculateTaxes() {
 		const grossIncome = parseFloat((document.getElementById('gross-income') as HTMLInputElement).value) || 0;
 		const expenses = parseFloat((document.getElementById('expenses') as HTMLInputElement).value) || 0;
 		const filingStatus = (document.getElementById('filing-status') as HTMLSelectElement).value as 'single' | 'married';
+		const state = (document.getElementById('state') as HTMLSelectElement).value;
 
 		const netProfit = Math.max(0, grossIncome - expenses);
 
@@ -188,7 +297,29 @@ import Layout from '../layouts/Layout.astro';
 			}
 		}
 
-		const totalTax = seTax + federalTax;
+		// State Income Tax
+		let stateTax = 0;
+		const stateData = stateTaxData[state];
+		if (stateData) {
+			if (stateData.type === "flat") {
+				// Flat tax usually applies to net profit or taxable income. We use taxable income to be safe/conservative.
+				stateTax = taxableIncome * stateData.rate;
+			} else if (stateData.type === "progressive") {
+				const stateTaxableIncome = Math.max(0, netProfit - seTaxDeduction - stateData.std);
+				let sPrevLimit = 0;
+				for (const bracket of stateData.brackets) {
+					if (stateTaxableIncome > sPrevLimit) {
+						const sAmount = Math.min(stateTaxableIncome, bracket.limit) - sPrevLimit;
+						stateTax += sAmount * bracket.rate;
+						sPrevLimit = bracket.limit;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+
+		const totalTax = seTax + federalTax + stateTax;
 		const takeHome = netProfit - totalTax;
 		const effectiveRate = grossIncome > 0 ? (totalTax / grossIncome) * 100 : 0;
 
@@ -196,6 +327,7 @@ import Layout from '../layouts/Layout.astro';
 		document.getElementById('out-net-profit')!.textContent = formatUSD(netProfit);
 		document.getElementById('out-se-tax')!.textContent = formatUSD(seTax);
 		document.getElementById('out-fed-tax')!.textContent = formatUSD(federalTax);
+		document.getElementById('out-state-tax')!.textContent = formatUSD(stateTax);
 		document.getElementById('out-total-tax')!.textContent = formatUSD(totalTax);
 		document.getElementById('out-take-home')!.textContent = formatUSD(takeHome);
 		document.getElementById('out-effective-rate')!.textContent = `Effective Tax Rate: ${effectiveRate.toFixed(1)}%`;
@@ -205,23 +337,26 @@ import Layout from '../layouts/Layout.astro';
 			const takeHomePct = (takeHome / grossIncome) * 100;
 			const seTaxPct = (seTax / grossIncome) * 100;
 			const fedTaxPct = (federalTax / grossIncome) * 100;
+			const stateTaxPct = (stateTax / grossIncome) * 100;
 			const expPct = (expenses / grossIncome) * 100;
 
 			document.getElementById('bar-take-home')!.style.width = `${Math.max(0, takeHomePct)}%`;
 			document.getElementById('bar-se-tax')!.style.width = `${Math.max(0, seTaxPct)}%`;
 			document.getElementById('bar-fed-tax')!.style.width = `${Math.max(0, fedTaxPct)}%`;
+			document.getElementById('bar-state-tax')!.style.width = `${Math.max(0, stateTaxPct)}%`;
 			document.getElementById('bar-expenses')!.style.width = `${Math.max(0, expPct)}%`;
 		} else {
 			document.getElementById('bar-take-home')!.style.width = '0%';
 			document.getElementById('bar-se-tax')!.style.width = '0%';
 			document.getElementById('bar-fed-tax')!.style.width = '0%';
+			document.getElementById('bar-state-tax')!.style.width = '0%';
 			document.getElementById('bar-expenses')!.style.width = '0%';
 		}
 	}
 
 	// Listeners
 	document.addEventListener('DOMContentLoaded', () => {
-		const inputs = ['gross-income', 'expenses', 'filing-status'];
+		const inputs = ['gross-income', 'expenses', 'filing-status', 'state'];
 		inputs.forEach(id => {
 			document.getElementById(id)?.addEventListener('input', calculateTaxes);
 		});
