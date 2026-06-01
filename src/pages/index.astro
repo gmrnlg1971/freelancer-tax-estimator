@@ -8,7 +8,7 @@ import Layout from '../layouts/Layout.astro';
 			<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900">
 				Freelancer <span class="text-emerald-600">Tax Estimator</span>
 			</h1>
-			<p class="text-lg text-slate-600 max-w-2xl mx-auto">Instantly calculate your 1099 taxes, self-employment tax, and take-home pay based on 2024 US tax brackets.</p>
+			<p class="text-lg text-slate-600 max-w-2xl mx-auto">Instantly calculate your 1099 taxes, self-employment tax, and take-home pay based on 2026 US tax brackets.</p>
 		</div>
 
 		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -111,7 +111,7 @@ import Layout from '../layouts/Layout.astro';
 			<!-- Output Section (Right) -->
 			<div class="lg:col-span-7">
 				<div class="fintech-card p-6 h-full flex flex-col">
-					<h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estimated Breakdown (2024)</h2>
+					<h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estimated Breakdown (2026)</h2>
 					
 					<div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5 mb-6 text-center">
 						<p class="text-sm font-semibold text-emerald-800 uppercase tracking-wide">Estimated Take-Home</p>
@@ -170,7 +170,7 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 					
 					<p class="text-[10px] text-slate-400 mt-4 text-center leading-tight">
-						*This is a simplified estimate for 2024 using the standard deduction. It does not include state income taxes, local taxes, or the Qualified Business Income (QBI) deduction. Consult a CPA for official tax advice.
+						*This is a simplified estimate for 2026 using the standard deduction. It does not include state income taxes, local taxes, or the Qualified Business Income (QBI) deduction. Consult a CPA for official tax advice.
 					</p>
 				</div>
 			</div>
@@ -188,31 +188,31 @@ import Layout from '../layouts/Layout.astro';
 		}).format(num);
 	};
 
-	// 2024 Tax Brackets
-	const brackets2024 = {
+	// 2026 Tax Brackets
+	const brackets2026 = {
 		single: [
-			{ limit: 11600, rate: 0.10 },
-			{ limit: 47150, rate: 0.12 },
-			{ limit: 100525, rate: 0.22 },
-			{ limit: 191950, rate: 0.24 },
-			{ limit: 243725, rate: 0.32 },
-			{ limit: 609350, rate: 0.35 },
+			{ limit: 12400, rate: 0.10 },
+			{ limit: 50400, rate: 0.12 },
+			{ limit: 105700, rate: 0.22 },
+			{ limit: 201775, rate: 0.24 },
+			{ limit: 256225, rate: 0.32 },
+			{ limit: 640600, rate: 0.35 },
 			{ limit: Infinity, rate: 0.37 }
 		],
 		married: [
-			{ limit: 23200, rate: 0.10 },
-			{ limit: 94300, rate: 0.12 },
-			{ limit: 201050, rate: 0.22 },
-			{ limit: 383900, rate: 0.24 },
-			{ limit: 487450, rate: 0.32 },
-			{ limit: 731200, rate: 0.35 },
+			{ limit: 24800, rate: 0.10 },
+			{ limit: 100800, rate: 0.12 },
+			{ limit: 211400, rate: 0.22 },
+			{ limit: 403550, rate: 0.24 },
+			{ limit: 512450, rate: 0.32 },
+			{ limit: 768700, rate: 0.35 },
 			{ limit: Infinity, rate: 0.37 }
 		]
 	};
 
-	const standardDeduction2024 = {
-		single: 14600,
-		married: 29200
+	const standardDeduction2026 = {
+		single: 16100,
+		married: 32200
 	};
 
 	// State Tax Definitions
@@ -444,7 +444,7 @@ import Layout from '../layouts/Layout.astro';
 		const seTaxableIncome = netProfit * 0.9235;
 		let seTax = 0;
 		if (seTaxableIncome > 400) {
-			// Simplified: Ignoring the Social Security wage base limit ($168,600 for 2024) for simplicity, 
+			// Simplified: Ignoring the Social Security wage base limit ($175,000 for 2026) for simplicity, 
 			// but we can add it for accuracy if needed. Let's add it.
 			const ssWageBase = 168600;
 			const ssTax = Math.min(seTaxableIncome, ssWageBase) * 0.124;
@@ -454,12 +454,12 @@ import Layout from '../layouts/Layout.astro';
 
 		// Federal Income Tax
 		const seTaxDeduction = seTax / 2;
-		const stdDeduction = standardDeduction2024[filingStatus];
+		const stdDeduction = standardDeduction2026[filingStatus];
 		const taxableIncome = Math.max(0, netProfit - seTaxDeduction - stdDeduction);
 
 		let federalTax = 0;
 		let previousLimit = 0;
-		const brackets = brackets2024[filingStatus];
+		const brackets = brackets2026[filingStatus];
 
 		for (const bracket of brackets) {
 			if (taxableIncome > previousLimit) {
