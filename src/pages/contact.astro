@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Contact Us - 1099TaxEst">
+	<div class="max-w-3xl mx-auto px-4 py-16">
+		<h1 class="text-3xl font-bold text-slate-900 mb-6">Contact Us</h1>
+		<div class="fintech-card p-8">
+			<p class="text-slate-600 mb-6">Have a question, feedback, or a feature request? Please let us know.</p>
+			<form class="flex flex-col gap-4 max-w-lg">
+				<div>
+					<label class="block text-sm font-semibold text-slate-700 mb-1">Name</label>
+					<input type="text" class="input-field" placeholder="Jane Doe" />
+				</div>
+				<div>
+					<label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+					<input type="email" class="input-field" placeholder="jane@example.com" />
+				</div>
+				<div>
+					<label class="block text-sm font-semibold text-slate-700 mb-1">Message</label>
+					<textarea rows="4" class="input-field"></textarea>
+				</div>
+				<button type="button" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-lg mt-2 transition-colors">Send Message</button>
+			</form>
+		</div>
+	</div>
+</Layout>

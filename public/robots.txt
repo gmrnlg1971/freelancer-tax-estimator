@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://freelancer-tax-estimator.pages.dev/sitemap-index.xml

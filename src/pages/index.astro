@@ -1,0 +1,232 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Freelancer Tax Estimator | 1099 Tax Calculator">
+	<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+		<div class="text-center mb-10">
+			<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-slate-900">
+				Freelancer <span class="text-emerald-600">Tax Estimator</span>
+			</h1>
+			<p class="text-lg text-slate-600 max-w-2xl mx-auto">Instantly calculate your 1099 taxes, self-employment tax, and take-home pay based on 2024 US tax brackets.</p>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+			<!-- Input Section (Left) -->
+			<div class="lg:col-span-5 space-y-6">
+				<div class="fintech-card p-6">
+					<h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Your Details</h2>
+					
+					<div class="space-y-5">
+						<div>
+							<label for="gross-income" class="block text-sm font-semibold text-slate-700 mb-1">Gross Annual Income</label>
+							<div class="relative">
+								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<span class="text-slate-400 font-medium">$</span>
+								</div>
+								<input type="number" id="gross-income" class="input-field pl-8 font-medium" placeholder="75000" min="0" value="75000" />
+							</div>
+							<p class="text-xs text-slate-500 mt-1">Total 1099-NEC earnings before expenses.</p>
+						</div>
+
+						<div>
+							<label for="expenses" class="block text-sm font-semibold text-slate-700 mb-1">Business Expenses</label>
+							<div class="relative">
+								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<span class="text-slate-400 font-medium">$</span>
+								</div>
+								<input type="number" id="expenses" class="input-field pl-8 font-medium" placeholder="5000" min="0" value="5000" />
+							</div>
+							<p class="text-xs text-slate-500 mt-1">Deductible business write-offs.</p>
+						</div>
+
+						<div>
+							<label for="filing-status" class="block text-sm font-semibold text-slate-700 mb-1">Filing Status</label>
+							<select id="filing-status" class="input-field font-medium bg-white">
+								<option value="single">Single</option>
+								<option value="married">Married Filing Jointly</option>
+							</select>
+							<p class="text-xs text-slate-500 mt-1">Determines your standard deduction & brackets.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Output Section (Right) -->
+			<div class="lg:col-span-7">
+				<div class="fintech-card p-6 h-full flex flex-col">
+					<h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Estimated Breakdown (2024)</h2>
+					
+					<div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5 mb-6 text-center">
+						<p class="text-sm font-semibold text-emerald-800 uppercase tracking-wide">Estimated Take-Home</p>
+						<p class="text-4xl md:text-5xl font-extrabold text-emerald-600 mt-1" id="out-take-home">$0</p>
+						<p class="text-sm text-emerald-700 mt-2 font-medium" id="out-effective-rate">Effective Tax Rate: 0.0%</p>
+					</div>
+
+					<div class="space-y-4 flex-grow">
+						<div class="flex justify-between items-center pb-3 border-b border-slate-100">
+							<span class="text-slate-600 font-medium">Net Business Profit</span>
+							<span class="font-bold text-slate-800" id="out-net-profit">$0</span>
+						</div>
+						<div class="flex justify-between items-center pb-3 border-b border-slate-100">
+							<div class="flex items-center gap-2">
+								<div class="w-3 h-3 rounded-full bg-blue-500"></div>
+								<span class="text-slate-600 font-medium">Self-Employment Tax</span>
+							</div>
+							<span class="font-bold text-slate-800" id="out-se-tax">$0</span>
+						</div>
+						<div class="flex justify-between items-center pb-3 border-b border-slate-100">
+							<div class="flex items-center gap-2">
+								<div class="w-3 h-3 rounded-full bg-indigo-500"></div>
+								<span class="text-slate-600 font-medium">Federal Income Tax</span>
+							</div>
+							<span class="font-bold text-slate-800" id="out-fed-tax">$0</span>
+						</div>
+						<div class="flex justify-between items-center pt-2">
+							<span class="text-slate-800 font-bold">Total Estimated Tax</span>
+							<span class="font-extrabold text-red-500 text-lg" id="out-total-tax">$0</span>
+						</div>
+					</div>
+
+					<!-- Visual Bar -->
+					<div class="mt-6 pt-6 border-t border-slate-100">
+						<div class="h-4 w-full bg-slate-100 rounded-full overflow-hidden flex" id="visual-bar">
+							<div class="bg-emerald-500 h-full" id="bar-take-home" style="width: 70%"></div>
+							<div class="bg-blue-500 h-full" id="bar-se-tax" style="width: 15%"></div>
+							<div class="bg-indigo-500 h-full" id="bar-fed-tax" style="width: 10%"></div>
+							<div class="bg-slate-300 h-full" id="bar-expenses" style="width: 5%"></div>
+						</div>
+						<div class="flex justify-between text-[10px] sm:text-xs text-slate-500 mt-2 font-medium">
+							<span>Take Home</span>
+							<span>SE Tax</span>
+							<span>Fed Tax</span>
+							<span>Expenses</span>
+						</div>
+					</div>
+					
+					<p class="text-[10px] text-slate-400 mt-4 text-center leading-tight">
+						*This is a simplified estimate for 2024 using the standard deduction. It does not include state income taxes, local taxes, or the Qualified Business Income (QBI) deduction. Consult a CPA for official tax advice.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+	// Format currency
+	const formatUSD = (num: number) => {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+			maximumFractionDigits: 0
+		}).format(num);
+	};
+
+	// 2024 Tax Brackets
+	const brackets2024 = {
+		single: [
+			{ limit: 11600, rate: 0.10 },
+			{ limit: 47150, rate: 0.12 },
+			{ limit: 100525, rate: 0.22 },
+			{ limit: 191950, rate: 0.24 },
+			{ limit: 243725, rate: 0.32 },
+			{ limit: 609350, rate: 0.35 },
+			{ limit: Infinity, rate: 0.37 }
+		],
+		married: [
+			{ limit: 23200, rate: 0.10 },
+			{ limit: 94300, rate: 0.12 },
+			{ limit: 201050, rate: 0.22 },
+			{ limit: 383900, rate: 0.24 },
+			{ limit: 487450, rate: 0.32 },
+			{ limit: 731200, rate: 0.35 },
+			{ limit: Infinity, rate: 0.37 }
+		]
+	};
+
+	const standardDeduction2024 = {
+		single: 14600,
+		married: 29200
+	};
+
+	function calculateTaxes() {
+		const grossIncome = parseFloat((document.getElementById('gross-income') as HTMLInputElement).value) || 0;
+		const expenses = parseFloat((document.getElementById('expenses') as HTMLInputElement).value) || 0;
+		const filingStatus = (document.getElementById('filing-status') as HTMLSelectElement).value as 'single' | 'married';
+
+		const netProfit = Math.max(0, grossIncome - expenses);
+
+		// Self Employment Tax (15.3% on 92.35% of net profit)
+		const seTaxableIncome = netProfit * 0.9235;
+		let seTax = 0;
+		if (seTaxableIncome > 400) {
+			// Simplified: Ignoring the Social Security wage base limit ($168,600 for 2024) for simplicity, 
+			// but we can add it for accuracy if needed. Let's add it.
+			const ssWageBase = 168600;
+			const ssTax = Math.min(seTaxableIncome, ssWageBase) * 0.124;
+			const medicareTax = seTaxableIncome * 0.029;
+			seTax = ssTax + medicareTax;
+		}
+
+		// Federal Income Tax
+		const seTaxDeduction = seTax / 2;
+		const stdDeduction = standardDeduction2024[filingStatus];
+		const taxableIncome = Math.max(0, netProfit - seTaxDeduction - stdDeduction);
+
+		let federalTax = 0;
+		let previousLimit = 0;
+		const brackets = brackets2024[filingStatus];
+
+		for (const bracket of brackets) {
+			if (taxableIncome > previousLimit) {
+				const taxableAmountInBracket = Math.min(taxableIncome, bracket.limit) - previousLimit;
+				federalTax += taxableAmountInBracket * bracket.rate;
+				previousLimit = bracket.limit;
+			} else {
+				break;
+			}
+		}
+
+		const totalTax = seTax + federalTax;
+		const takeHome = netProfit - totalTax;
+		const effectiveRate = grossIncome > 0 ? (totalTax / grossIncome) * 100 : 0;
+
+		// Update UI
+		document.getElementById('out-net-profit')!.textContent = formatUSD(netProfit);
+		document.getElementById('out-se-tax')!.textContent = formatUSD(seTax);
+		document.getElementById('out-fed-tax')!.textContent = formatUSD(federalTax);
+		document.getElementById('out-total-tax')!.textContent = formatUSD(totalTax);
+		document.getElementById('out-take-home')!.textContent = formatUSD(takeHome);
+		document.getElementById('out-effective-rate')!.textContent = `Effective Tax Rate: ${effectiveRate.toFixed(1)}%`;
+
+		// Update Visual Bar
+		if (grossIncome > 0) {
+			const takeHomePct = (takeHome / grossIncome) * 100;
+			const seTaxPct = (seTax / grossIncome) * 100;
+			const fedTaxPct = (federalTax / grossIncome) * 100;
+			const expPct = (expenses / grossIncome) * 100;
+
+			document.getElementById('bar-take-home')!.style.width = `${Math.max(0, takeHomePct)}%`;
+			document.getElementById('bar-se-tax')!.style.width = `${Math.max(0, seTaxPct)}%`;
+			document.getElementById('bar-fed-tax')!.style.width = `${Math.max(0, fedTaxPct)}%`;
+			document.getElementById('bar-expenses')!.style.width = `${Math.max(0, expPct)}%`;
+		} else {
+			document.getElementById('bar-take-home')!.style.width = '0%';
+			document.getElementById('bar-se-tax')!.style.width = '0%';
+			document.getElementById('bar-fed-tax')!.style.width = '0%';
+			document.getElementById('bar-expenses')!.style.width = '0%';
+		}
+	}
+
+	// Listeners
+	document.addEventListener('DOMContentLoaded', () => {
+		const inputs = ['gross-income', 'expenses', 'filing-status'];
+		inputs.forEach(id => {
+			document.getElementById(id)?.addEventListener('input', calculateTaxes);
+		});
+		
+		// Initial calculation
+		calculateTaxes();
+	});
+</script>
